@@ -1,6 +1,6 @@
 # SystemTranslation
 
-Apple's Translation framework binds `TranslationSession` with SwiftUI's `View`.  It doesn't have an init method for initialization; a `session` must be started using the `translationTask` of its `View`.
+Apple's Translation framework binds `TranslationSession` with SwiftUI's `View`, It doesn't have an init method for initialization, a `session` must be started using the `translationTask` of its `View`.
 
 This library decouples these dependencies. It achieves this by displaying a transparent, non-interactive window to host a View for translation, enabling translation without SwiftUI or a user interface.
 
