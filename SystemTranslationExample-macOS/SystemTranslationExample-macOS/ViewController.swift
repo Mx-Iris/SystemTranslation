@@ -13,7 +13,6 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        
 //        Task {
 //            do {
 //                try await TranslationService.shared.prepareTranslation(in: self, source: .japanese, target: .french)
@@ -25,13 +24,12 @@ class ViewController: NSViewController {
 //        }
     }
 
-    override func viewDidAppear() {
-        super.viewDidAppear()
-        let viewController = TranslationDownloadViewController()
+    @IBAction func presentDownloadViewControllerAction(_ sender: Any) {
+        let viewController = TranslationLanguageDownloadViewController()
         viewController.preferredContentSize = .init(width: 800, height: 500)
         presentAsSheet(viewController)
     }
-    
+
     override var representedObject: Any? {
         didSet {
             // Update the view, if already loaded.

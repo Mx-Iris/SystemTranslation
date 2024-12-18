@@ -6,7 +6,7 @@ import SwiftUI
 @available(macOS 15.0, *)
 final class TranslationHeadlessWindow: NSWindow, TranslationHeadlessWindowProtocol {
     func show() {
-        makeKeyAndOrderFront(nil)
+        orderBack(nil)
     }
     
     static func makeWindow() -> Self {

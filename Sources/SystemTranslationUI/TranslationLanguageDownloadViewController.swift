@@ -3,22 +3,33 @@ import AppKit
 import Translation
 import SystemTranslation
 
+@MainActor
 @available(macOS 15.0, *)
-public final class TranslationDownloadViewController: NSViewController {
-    enum Section {
+public final class TranslationLanguageDownloadViewController: NSViewController {
+    private enum Section {
         case main
     }
 
-    typealias DataSource = NSTableViewDiffableDataSource<Section, TranslationLanguageDownloadStatus>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, TranslationLanguageDownloadStatus>
+    private typealias DataSource = NSTableViewDiffableDataSource<Section, TranslationLanguageDownloadStatus>
 
-    let scrollView = NSScrollView()
+    private typealias Snapshot = NSDiffableDataSourceSnapshot<Section, TranslationLanguageDownloadStatus>
 
-    let tableView = NSTableView()
+    private let scrollView = NSScrollView()
 
+    private let tableView = NSTableView()
+    
+    private let titleLabel = NSTextField(labelWithString: "Download Translation Languages")
+
+    private let descriptionLabel = NSTextField(labelWithString: "Download translation languages to use the translation feature.")
+
+    private lazy var doneButton = NSButton(title: "Done", target: self, action: #selector(doneAction))
+
+    private let topStackView = NSStackView()
+
+    private let bottomStackView = NSStackView()
+    
     private lazy var dataSource = makeDataSource()
 
-    @MainActor
     private var downloadStatuses: [TranslationLanguageDownloadStatus] = []
 
     public override func loadView() {
@@ -27,17 +38,48 @@ public final class TranslationDownloadViewController: NSViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-
         view.addSubview(scrollView)
-        scrollView.documentView = tableView
+        view.addSubview(topStackView)
+        view.addSubview(bottomStackView)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.hasVerticalScroller = true
+
+        topStackView.translatesAutoresizingMaskIntoConstraints = false
+        bottomStackView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            topStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            topStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            topStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+            scrollView.topAnchor.constraint(equalTo: topStackView.bottomAnchor, constant: 20),
+            scrollView.bottomAnchor.constraint(equalTo: bottomStackView.topAnchor, constant: -20),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+            bottomStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            bottomStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            bottomStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
         ])
+        scrollView.documentView = tableView
+        scrollView.hasVerticalScroller = true
+        scrollView.scrollerStyle = .overlay
+        scrollView.borderType = .bezelBorder
+        topStackView.orientation = .vertical
+        topStackView.spacing = 10
+        topStackView.distribution = .fill
+        topStackView.alignment = .leading
+        topStackView.addArrangedSubview(titleLabel)
+        topStackView.addArrangedSubview(descriptionLabel)
+        bottomStackView.orientation = .horizontal
+        bottomStackView.spacing = 10
+        bottomStackView.distribution = .gravityAreas
+        bottomStackView.alignment = .centerY
+        bottomStackView.addView(doneButton, in: .trailing)
+        titleLabel.font = .systemFont(ofSize: 20, weight: .bold)
+        titleLabel.textColor = .labelColor
+        descriptionLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        descriptionLabel.textColor = .secondaryLabelColor
+        doneButton.keyEquivalent = "\r"
+
         tableView.dataSource = dataSource
         tableView.headerView = nil
         tableView.rowHeight = 45
@@ -45,18 +87,21 @@ public final class TranslationDownloadViewController: NSViewController {
         tableView.usesAlternatingRowBackgroundColors = true
         tableView.addTableColumn(.init(identifier: .init(.init(describing: Self.self))))
 
-        fetchDownloadStatuses()
-    }
-
-    func fetchDownloadStatuses() {
         Task {
-            downloadStatuses = await TranslationService.shared.languageDownloadStatuses
-            reloadData()
+            await fetchDownloadStatuses()
         }
     }
 
-    @MainActor
-    func reloadData() {
+    @objc private func doneAction() {
+        dismiss(nil)
+    }
+
+    private func fetchDownloadStatuses() async {
+        downloadStatuses = await TranslationService.shared.languageDownloadStatuses
+        reloadData()
+    }
+
+    private func reloadData() {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
         snapshot.appendItems(downloadStatuses, toSection: .main)
@@ -72,8 +117,9 @@ public final class TranslationDownloadViewController: NSViewController {
             cellView.downloadButtonClicked = {
                 Task {
                     do {
+                        await self.fetchDownloadStatuses()
                         try await TranslationService.shared.prepareTranslation(in: self, source: downloadStatus.language, target: nil)
-                        self.fetchDownloadStatuses()
+                        await self.fetchDownloadStatuses()
                     } catch {
                         await MainActor.run {
                             if let window = self.view.window {
@@ -89,7 +135,7 @@ public final class TranslationDownloadViewController: NSViewController {
         }
     }
 
-    class TableCellView: NSTableCellView {
+    private class TableCellView: NSTableCellView {
         var downloadButtonClicked: (() -> Void)?
 
         var title: String = "" {
@@ -119,6 +165,7 @@ public final class TranslationDownloadViewController: NSViewController {
             addSubview(downloadButton)
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             downloadButton.translatesAutoresizingMaskIntoConstraints = false
+            downloadButton.symbolConfiguration = .init(pointSize: 18, weight: .regular)
             NSLayoutConstraint.activate([
                 titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
                 titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),

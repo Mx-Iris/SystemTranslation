@@ -18,7 +18,7 @@ public final class TranslationService {
     public static let shared = TranslationService()
 
     private let languageAvailability = LanguageAvailability()
-    
+
     private var headlessWindow: TranslationHeadlessWindowProtocol
 
     private var coordinatorByLanguagePairing: [TranslationLanguagePairing: TranslationCoordinator] = [:]
@@ -31,31 +31,27 @@ public final class TranslationService {
 
     private func fetchSession(source: TranslationLanguage, target: TranslationLanguage?, in viewController: NSUIViewController? = nil) async throws -> TranslationSessionBox {
         let languagePairing = TranslationLanguagePairing(source: source, target: target)
-        
+
         let coordinator = if let coordinator = coordinatorByLanguagePairing[languagePairing] {
             coordinator
         } else {
             TranslationCoordinator()
         }
-        
+
         if let session = coordinator.session, !session.isInvalid {
             print(coordinator.session?.session, coordinator.session?.isInvalid)
             return session
         }
-        
+
         coordinatorByLanguagePairing[languagePairing] = coordinator
 
         await MainActor.run {
             if let viewController {
-                if let headlessViewController = headlessWindow.uninstallViewController(forLanguagePairing: languagePairing) {
-                    viewController.view.addSubview(headlessViewController.view)
-                    viewController.addChild(headlessViewController)
-                } else {
-                    let headlessViewController = TranslationHeadlessViewController(coordinator: coordinator)
-                    headlessWindow.addViewController(headlessViewController, forLanguagePairing: languagePairing)
-                    viewController.view.addSubview(headlessViewController.view)
-                    viewController.addChild(headlessViewController)
-                }
+                headlessWindow.uninstallViewController(forLanguagePairing: languagePairing)
+                let headlessViewController = TranslationHeadlessViewController(coordinator: coordinator)
+                headlessWindow.addViewController(headlessViewController, forLanguagePairing: languagePairing)
+                viewController.view.addSubview(headlessViewController.view)
+                viewController.addChild(headlessViewController)
             } else {
                 if !headlessWindow.isExist(forLanguagePairing: languagePairing) {
                     let headlessViewController = TranslationHeadlessViewController(coordinator: coordinator)
