@@ -1,11 +1,3 @@
-//
-//  TranslationDownloadViewController.swift
-//  SystemTranslation
-//
-//  Created by JH on 2024/12/18.
-//
-
-import Foundation
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
 import AppKit
 import Translation
@@ -39,6 +31,7 @@ public final class TranslationDownloadViewController: NSViewController {
         view.addSubview(scrollView)
         scrollView.documentView = tableView
         scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.hasVerticalScroller = true
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -47,10 +40,11 @@ public final class TranslationDownloadViewController: NSViewController {
         ])
         tableView.dataSource = dataSource
         tableView.headerView = nil
+        tableView.rowHeight = 45
         tableView.selectionHighlightStyle = .none
         tableView.usesAlternatingRowBackgroundColors = true
         tableView.addTableColumn(.init(identifier: .init(.init(describing: Self.self))))
-        
+
         fetchDownloadStatuses()
     }
 

@@ -39,6 +39,7 @@ class TranslationHeadlessViewController: NSHostingController<TranslationHeadless
     override func viewWillDisappear() {
         super.viewWillDisappear()
         coordinator.session?.invalidSession()
+        coordinator.session = nil
     }
     
     @available(*, unavailable)

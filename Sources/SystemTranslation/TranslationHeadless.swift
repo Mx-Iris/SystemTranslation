@@ -1,9 +1,11 @@
 import Foundation
 
 @available(macOS 15.0, iOS 18.0, *)
+@MainActor
 protocol TranslationHeadlessViewControllerProtocol: NSUIViewController {}
 
 @available(macOS 15.0, iOS 18.0, *)
+@MainActor
 protocol TranslationHeadlessWindowProtocol: AnyObject {
     ///    associatedtype ViewController: TranslationHeadlessViewControllerProtocol
     typealias ViewController = TranslationHeadlessViewControllerProtocol
@@ -14,6 +16,7 @@ protocol TranslationHeadlessWindowProtocol: AnyObject {
 }
 
 @available(macOS 15.0, iOS 18.0, *)
+@MainActor
 extension TranslationHeadlessWindowProtocol {
     func addViewController(_ viewController: ViewController, forLanguagePairing languagePairing: TranslationLanguagePairing) {
         viewControllerByLanguagePairing[languagePairing] = viewController
@@ -36,10 +39,12 @@ extension TranslationHeadlessWindowProtocol {
         return true
     }
 
+    @discardableResult
     func uninstallViewController(forLanguagePairing languagePairing: TranslationLanguagePairing) -> ViewController? {
         let viewController = viewControllerByLanguagePairing[languagePairing]
         viewController?.view.removeFromSuperview()
         viewController?.removeFromParent()
+        viewControllerByLanguagePairing[languagePairing] = nil
         return viewController
     }
 }
