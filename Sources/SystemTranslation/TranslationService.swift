@@ -20,7 +20,7 @@ public final class TranslationService {
     private let languageAvailability = LanguageAvailability()
 
     private var headlessWindow: TranslationHeadlessWindowProtocol
-
+    
     private var coordinatorByLanguagePairing: [TranslationLanguagePairing: TranslationCoordinator] = [:]
 
     @MainActor
@@ -43,9 +43,8 @@ public final class TranslationService {
             return session
         }
 
-        coordinatorByLanguagePairing[languagePairing] = coordinator
-
         await MainActor.run {
+            coordinatorByLanguagePairing[languagePairing] = coordinator
             if let viewController {
                 headlessWindow.uninstallViewController(forLanguagePairing: languagePairing)
                 let headlessViewController = TranslationHeadlessViewController(coordinator: coordinator)
