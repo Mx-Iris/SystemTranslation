@@ -11,8 +11,8 @@ import Translation
 @available(macOS 15.0, iOS 18.0, *)
 struct TranslationLanguagePairing: Hashable {
     let source: TranslationLanguage
-    let target: TranslationLanguage
-    init(source: TranslationLanguage, target: TranslationLanguage) {
+    let target: TranslationLanguage?
+    init(source: TranslationLanguage, target: TranslationLanguage?) {
         self.source = source
         self.target = target
     }
@@ -20,7 +20,12 @@ struct TranslationLanguagePairing: Hashable {
 
 @available(macOS 15.0, iOS 18.0, *)
 extension TranslationSession.Configuration {
-    init(sourceLanguage: TranslationLanguage, targetLanguage: TranslationLanguage) {
-        self.init(source: sourceLanguage.localeLanguage, target: targetLanguage.localeLanguage)
+    
+    init(languagePairing: TranslationLanguagePairing) {
+        self.init(sourceLanguage: languagePairing.source, targetLanguage: languagePairing.target)
+    }
+    
+    init(sourceLanguage: TranslationLanguage, targetLanguage: TranslationLanguage?) {
+        self.init(source: sourceLanguage.localeLanguage, target: targetLanguage?.localeLanguage)
     }
 }

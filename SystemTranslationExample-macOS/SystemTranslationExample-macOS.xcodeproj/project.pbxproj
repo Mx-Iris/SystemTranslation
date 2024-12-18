@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E9096BE92D11A2030031A5E5 /* SystemTranslation in Frameworks */ = {isa = PBXBuildFile; productRef = E9096BE82D11A2030031A5E5 /* SystemTranslation */; };
+		E96ADB9E2D12C8B500656DB8 /* SystemTranslationUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96ADB9D2D12C8B500656DB8 /* SystemTranslationUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9096BE92D11A2030031A5E5 /* SystemTranslation in Frameworks */,
+				E96ADB9E2D12C8B500656DB8 /* SystemTranslationUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +40,7 @@
 			isa = PBXGroup;
 			children = (
 				E9096BD72D11A1ED0031A5E5 /* SystemTranslationExample-macOS */,
+				E96ADB9C2D12C8B500656DB8 /* Frameworks */,
 				E9096BD62D11A1ED0031A5E5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,6 +51,13 @@
 				E9096BD52D11A1ED0031A5E5 /* SystemTranslationExample-macOS.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E96ADB9C2D12C8B500656DB8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,6 +81,7 @@
 			name = "SystemTranslationExample-macOS";
 			packageProductDependencies = (
 				E9096BE82D11A2030031A5E5 /* SystemTranslation */,
+				E96ADB9D2D12C8B500656DB8 /* SystemTranslationUI */,
 			);
 			productName = "SystemTranslationExample-macOS";
 			productReference = E9096BD52D11A1ED0031A5E5 /* SystemTranslationExample-macOS.app */;
@@ -269,6 +280,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.JH.SystemTranslationExample-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -294,6 +306,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.JH.SystemTranslationExample-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -336,6 +349,11 @@
 		E9096BE82D11A2030031A5E5 /* SystemTranslation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SystemTranslation;
+		};
+		E96ADB9D2D12C8B500656DB8 /* SystemTranslationUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9096BE72D11A2030031A5E5 /* XCLocalSwiftPackageReference "../../SystemTranslation" */;
+			productName = SystemTranslationUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

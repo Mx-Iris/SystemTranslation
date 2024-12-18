@@ -16,6 +16,8 @@ import Translation
 public final class TranslationService {
     public static let shared = TranslationService()
 
+    private let languageAvailability = LanguageAvailability()
+    
     private var headlessWindow: TranslationHeadlessWindowProtocol
 
     private var coordinatorByLanguagePairing: [TranslationLanguagePairing: TranslationCoordinator] = [:]
@@ -27,7 +29,7 @@ public final class TranslationService {
         headlessWindow.show()
     }
 
-    private func fetchSession(source: TranslationLanguage, target: TranslationLanguage, in viewController: NSUIViewController? = nil) async throws -> TranslationSessionBox {
+    private func fetchSession(source: TranslationLanguage, target: TranslationLanguage?, in viewController: NSUIViewController? = nil) async throws -> TranslationSessionBox {
         let languagePairing = TranslationLanguagePairing(source: source, target: target)
         if let session = sessionByLanguagePairing[languagePairing], !session.isInvalid {
             return session
@@ -61,7 +63,7 @@ public final class TranslationService {
                 }
             }
         }
-        coordinator.configuration = .init(sourceLanguage: source, targetLanguage: target)
+        coordinator.configuration = .init(languagePairing: languagePairing)
         let session = try await withCheckedThrowingContinuation { continuation in
             if let session = coordinator.session {
                 continuation.resume(returning: session)
@@ -75,13 +77,39 @@ public final class TranslationService {
         return session
     }
 
-    public func translate(_ text: String, source: TranslationLanguage, target: TranslationLanguage) async throws -> String {
+    public func translate(_ text: String, source: TranslationLanguage, target: TranslationLanguage?) async throws -> String {
         let session = try await fetchSession(source: source, target: target)
         return try await session.session.translate(text).targetText
     }
 
-    public func prepareTranslation(in viewController: NSUIViewController, source: TranslationLanguage, target: TranslationLanguage) async throws {
+    public func prepareTranslation(in viewController: NSUIViewController, source: TranslationLanguage, target: TranslationLanguage?) async throws {
         let session = try await fetchSession(source: source, target: target, in: viewController)
         try await session.session.prepareTranslation()
+    }
+
+    public var languageDownloadStatuses: [TranslationLanguageDownloadStatus] {
+        get async {
+            await withTaskGroup(of: TranslationLanguageDownloadStatus.self) { group in
+                for language in TranslationLanguage.allCases {
+                    group.addTask {
+                        let status = await self.languageAvailability.status(from: language.localeLanguage, to: nil)
+                        let isDownloaded: Bool
+                        switch status {
+                        case .installed:
+                            isDownloaded = true
+                        default:
+                            isDownloaded = false
+                        }
+                        return TranslationLanguageDownloadStatus(language: language, isDownloaded: isDownloaded)
+                    }
+                }
+                var results: [TranslationLanguageDownloadStatus] = []
+                for await result in group {
+                    results.append(result)
+                }
+                results.sort(using: SortDescriptor(\.language.friendlyName, order: .forward))
+                return results
+            }
+        }
     }
 }
