@@ -7,7 +7,7 @@
 
 import Foundation
 
-@available(macOS 15.0, *)
+@available(macOS 15.0, iOS 18.0, *)
 public struct TranslationLanguageDownloadStatus: Hashable {
     public let language: TranslationLanguage
     public internal(set) var isDownloaded: Bool

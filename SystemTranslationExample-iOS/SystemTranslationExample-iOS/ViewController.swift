@@ -13,7 +13,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         Task {
             do {
-                let result = try await TranslationService.shared.translate("Hello", source: .english, target: .chineseSimplified)
+                let result = try await TranslationService.shared.translate("Hello", source: .englishUK, target: .chineseSimplified)
                 print(result)
             } catch {
                 print(error)
