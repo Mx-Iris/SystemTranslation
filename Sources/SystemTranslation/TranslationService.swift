@@ -39,7 +39,6 @@ public final class TranslationService {
         }
 
         if let session = coordinator.session, !session.isInvalid {
-            print(coordinator.session?.session, coordinator.session?.isInvalid)
             return session
         }
 
@@ -78,7 +77,8 @@ public final class TranslationService {
 
     public func translate(_ text: String, source: TranslationLanguage, target: TranslationLanguage?) async throws -> String {
         let session = try await fetchSession(source: source, target: target)
-        return try await session.session.translate(text).targetText
+        let response = try await session.session.translate(text)
+        return response.targetText
     }
 
     public func prepareTranslation(in viewController: NSUIViewController, source: TranslationLanguage, target: TranslationLanguage?) async throws {

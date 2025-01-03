@@ -13,15 +13,15 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-//        Task {
-//            do {
-//                try await TranslationService.shared.prepareTranslation(in: self, source: .japanese, target: .french)
-//                let result = try await TranslationService.shared.translate("こんにちは", source: .japanese, target: .french)
-//                print(result)
-//            } catch {
-//                print(error)
-//            }
-//        }
+        Task {
+            do {
+                try await TranslationService.shared.prepareTranslation(in: self, source: .japanese, target: .french)
+                let result = try await TranslationService.shared.translate("こんにちは", source: .japanese, target: .french)
+                print(result)
+            } catch {
+                print(error)
+            }
+        }
     }
 
     @IBAction func presentDownloadViewControllerAction(_ sender: Any) {
