@@ -5,6 +5,8 @@ import SwiftUI
 
 @available(macOS 15.0, *)
 final class TranslationHeadlessWindow: NSWindow, TranslationHeadlessWindowProtocol {
+    override var isVisible: Bool { false }
+    
     func show() {
         orderBack(nil)
     }
